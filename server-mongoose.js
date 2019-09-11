@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const Movies = require("./models/Movies");
 const app = express();
 
+// this connects to the DB
 mongoose
   .connect("mongodb://localhost/webmad0819", { useNewUrlParser: true })
   .then(x =>
@@ -10,7 +11,8 @@ mongoose
   )
   .catch(err => console.error("Error connecting to mongo", err));
 
-function cleanDuration(duration) {
+// this transforms duration in string format to a minutes computation
+function transformDurationToMinutes(duration) {
   let time = duration.split(" ");
 
   let hours;
@@ -31,6 +33,8 @@ function cleanDuration(duration) {
   return hours + minutes;
 }
 
+// this creates a new movie
+// example URL: http://localhost:5000/new-movie
 app.get("/new-movie", (req, res) => {
   Movies.create({
     title: "Ironmovie with timestamps",
@@ -39,17 +43,18 @@ app.get("/new-movie", (req, res) => {
     duration: "3h 30min"
   }).then(createdMovie => {
     let createdMovieClean = JSON.parse(JSON.stringify(createdMovie));
-    createdMovieClean.duration = cleanDuration(createdMovie.duration);
+    createdMovieClean.duration = transformDurationToMinutes(createdMovie.duration);
     res.json(createdMovieClean);
   });
 });
 
-// serves a dynamic json based on mongoose querying
+// this yields all the mongo movies
+// example URL: http://localhost:5000/movies-mongo
 app.get("/movies-mongo", (req, res) => {
   Movies.find().then(allMovies => {
     let allMoviesFinal = allMovies.map(movie => {
       movie = JSON.parse(JSON.stringify(movie));
-      movie.duration = cleanDuration(movie.duration);
+      movie.duration = transformDurationToMinutes(movie.duration);
 
       return movie;
     });
@@ -58,7 +63,8 @@ app.get("/movies-mongo", (req, res) => {
   });
 });
 
-// serves a static json hardcoded
+// this yields a hardcoded static json
+// example URL: http://localhost:5000/movies
 app.get("/movies", (req, res) => {
   res.json([
     {
@@ -80,6 +86,8 @@ app.get("/movies", (req, res) => {
   ]);
 });
 
+// this updates a movie with a specific ID
+// example URL: http://localhost:5000/movie/update/[your movie id, example: 5d7775a51be232a0c7086d68]
 app.get("/movie/update/:movieID", (req, res) => {
   Movies.findByIdAndUpdate(req.params.movieID, {
     title: "new ironmovida actualizada",
@@ -110,10 +118,14 @@ app.get("/movie/:movieID", (req, res) => {
     });
 });
 
+// this yields all students
+// example URL: http://localhost:5000/students
 app.get("/students", (req, res) => {
   res.json([{ s1: "pepe" }, { s2: "esther" }]);
 });
 
+// this yields all students by genre
+// example URL: http://localhost:5000/students/man
 app.get("/students/:genre", (req, res) => {
   if (req.params.genre === "man") {
     res.json([{ s1: "pepe" }]);

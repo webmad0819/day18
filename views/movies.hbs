@@ -1,0 +1,25 @@
+<h1>Ironhack's movie displayer</h1>
+
+{{#if noMovies}}
+<h2>No movies for that year</h2>
+{{else}}
+<select>
+    {{#each data}}<option>{{director}}</option>{{/each}}
+</select>
+<ul>
+    {{#each data}}
+    {{#if director}}
+    <li>
+        <h2>||{{title}}||</h2>
+
+        <p>The director was {{director}} and got a rate of {{rate}}</p>
+    </li>
+    {{/if}}
+    {{/each}}
+</ul>
+{{/if}}
+<script>
+    document.querySelector("li").onclick = function () {
+        alert("hola tronko")
+    }
+</script>
